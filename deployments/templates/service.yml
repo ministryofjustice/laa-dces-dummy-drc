@@ -6,7 +6,7 @@ spec:
   selector:
     app: dummy-drc # this should match the pod label in deployment.yml
   ports:
-    - name: https
+    - name: http
       port: 80
       targetPort: 8080
     - name: https
