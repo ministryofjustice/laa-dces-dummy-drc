@@ -7,8 +7,5 @@ spec:
     app: dummy-drc # this should match the pod label in deployment.yml
   ports:
     - name: https
-      port: 80
+      port: 8080
       targetPort: 8080
-    - name: mtls
-      port: 443
-      targetPort: 8443

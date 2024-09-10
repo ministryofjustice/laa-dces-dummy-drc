@@ -5,16 +5,16 @@ metadata:
   annotations:
     external-dns.alpha.kubernetes.io/set-identifier: dummy-drc-${NAMESPACE}-green
     external-dns.alpha.kubernetes.io/aws-weight: "100"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
-    nginx.ingress.kubernetes.io/auth-tls-secret: "${NAMESPACE}/client-ca-secret"  # Assuming the secret with CA certs for mTLS is named 'ca-cert'
-    nginx.ingress.kubernetes.io/auth-tls-verify-depth: "1"
-    nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
+#    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+#    nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
+#    nginx.ingress.kubernetes.io/auth-tls-secret: "${NAMESPACE}/client-ca-secret"  # Assuming the secret with CA certs for mTLS is named 'ca-cert'
+#    nginx.ingress.kubernetes.io/auth-tls-verify-depth: "1"
+#    nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
 spec:
   ingressClassName: default
-  tls:
-    - hosts:
-        - ${NAMESPACE}.apps.live.cloud-platform.service.justice.gov.uk
+#  tls:
+#    - hosts:
+#        - ${NAMESPACE}.apps.live.cloud-platform.service.justice.gov.uk
   rules:
     - host: ${NAMESPACE}.apps.live.cloud-platform.service.justice.gov.uk
       http:
