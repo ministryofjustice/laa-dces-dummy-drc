@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-deployment
+  labels:
+    app: dummy-drc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dummy-drc # this should match the selector in service.yml
+  template:
+    metadata:
+      labels:
+        app: dummy-drc # this should match the selector in service.yml
+    spec:
+      containers:
+        - name: dummy-drc
+          image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
+          ports:
+            - containerPort: 8080
+            - containerPort: 8443
