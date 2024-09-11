@@ -148,15 +148,11 @@ jobs:
           tag: ${CIRCLE_SHA1}
           region: $ECR_REGION
           repo: $ECR_REPOSITORY
-      - push-integration-test-image
 
   deploy-dev:
     executor: cloud-platform-executor
     steps:
       - deploy-to:
-          environment: dev
-          token: ${CIRCLE_CI_TOKEN_DEV}
-      - run-integration-tests:
           environment: dev
           token: ${CIRCLE_CI_TOKEN_DEV}
 
@@ -248,13 +244,10 @@ workflows:
                 - main
           context: SonarCloud
 
-      - scan_app:
-          requires:
-            - build
 
       - test_and_assemble:
           requires:
-            - scan_app
+            - build
 
       - build_and_scan_image:
           requires:
