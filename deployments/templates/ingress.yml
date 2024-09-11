@@ -1,9 +1,9 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: dummy-drc
+  name: dummy-drc-ingress
   annotations:
-    external-dns.alpha.kubernetes.io/set-identifier: dummy-drc-${NAMESPACE}-green
+    external-dns.alpha.kubernetes.io/set-identifier: dummy-drc-ingress-${NAMESPACE}-green
     external-dns.alpha.kubernetes.io/aws-weight: "100"
 #    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 #    nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
@@ -12,9 +12,9 @@ metadata:
 #    nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
 spec:
   ingressClassName: default
-#  tls:
-#    - hosts:
-#        - ${NAMESPACE}.apps.live.cloud-platform.service.justice.gov.uk
+  tls:
+    - hosts:
+        - ${NAMESPACE}.apps.live.cloud-platform.service.justice.gov.uk
   rules:
     - host: ${NAMESPACE}.apps.live.cloud-platform.service.justice.gov.uk
       http:
@@ -23,6 +23,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: dummy-drc # this should match the metadata.name in service.yml
+                name: dummy-drc-service # this should match the metadata.name in service.yml
                 port:
                   number: 8080

@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: example-deployment
+  name: dummy-drc-deployment
   labels:
     app: dummy-drc
 spec:
