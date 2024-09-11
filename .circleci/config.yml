@@ -196,13 +196,9 @@ workflows:
                 - main
           context: SonarCloud
 
-      - scan_app:
-          requires:
-            - build
-
       - test_and_assemble:
           requires:
-            - scan_app
+            - build
 
       - build_and_scan_image:
           requires:
