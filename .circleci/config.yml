@@ -1,0 +1,278 @@
+version: 2.1
+
+orbs:
+  aws-cli: circleci/aws-cli@4.0.0
+  aws-ecr: circleci/aws-ecr@8.2.1
+  helm: circleci/helm@1.2.0
+  snyk: snyk/snyk@1.4.0
+
+# ------------------
+# EXECUTORS
+# ------------------
+executors:
+  cloud-platform-executor:
+    resource_class: small
+    docker:
+      - image: ministryofjustice/cloud-platform-tools
+
+# ------------------
+# COMMANDS
+# ------------------
+commands:
+  checkout_and_decrypt:
+    steps:
+      - checkout
+      - run: echo "${GIT_CRYPT_KEY}" | base64 -d > git-crypt.key
+      - run: git-crypt unlock git-crypt.key
+
+  setup-kubectl:
+    description: >
+      Authenticate with kubernetes cluster
+    parameters:
+      environment:
+        description: Destination environment
+        type: string
+      token:
+        description: CircleCI Service account token
+        type: string
+    steps:
+      - run:
+          command: |
+            echo -n ${K8S_CLUSTER_CERT} | base64 -d > ./ca.crt
+            kubectl config set-cluster ${K8S_CLUSTER_NAME} --certificate-authority=./ca.crt --server=https://${K8S_CLUSTER_NAME}
+            kubectl config set-credentials circleci --token=<< parameters.token >>
+            kubectl config set-context ${K8S_CLUSTER_NAME} --cluster=${K8S_CLUSTER_NAME} --user=circleci --namespace=laa-dces-dummy-drc-<< parameters.environment >>
+            kubectl config use-context ${K8S_CLUSTER_NAME}
+            kubectl --namespace=laa-dces-dummy-drc-<< parameters.environment >> get pods
+
+  deploy-to:
+    description: >
+      Deploy image to the specified environment
+    parameters:
+      environment:
+        description: Destination environment
+        type: string
+      token:
+        description: CircleCI Service account token
+        type: string
+    steps:
+      - checkout_and_decrypt
+      - setup-kubectl:
+          environment: << parameters.environment >>
+          token: << parameters.token >>
+      - helm/upgrade-helm-chart:
+          namespace: laa-dces-dummy-drc-<< parameters.environment >>
+          update-repositories: false
+          chart: ./helm_deploy/laa-dces-dummy-drc/
+          release-name: laa-dces-dummy-drc
+          values: ./helm_deploy/laa-dces-dummy-drc/values-<< parameters.environment >>.yaml
+          values-to-override: image.tag=${CIRCLE_SHA1}
+
+# ------------------
+# JOBS
+# ------------------
+jobs:
+  build:
+    environment:
+      # Configure the JVM and Gradle to avoid OOM errors
+      _JAVA_OPTIONS: "-Xmx3g"
+      GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.workers.max=2"
+    docker:
+      - image: cimg/openjdk:17.0.4
+    working_directory: ~/laa-dces-dummy-drc/dces-dummy-drc
+    steps:
+      - checkout:
+          path: ~/laa-dces-dummy-drc
+      - run:
+          name: Install Dependencies and Build
+          command: ./gradlew clean build
+
+  test_and_assemble:
+    environment:
+      _JAVA_OPTIONS: "-Xmx3g"
+      GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.workers.max=2"
+    docker:
+      - image: cimg/openjdk:17.0.4
+    working_directory: ~/laa-dces-dummy-drc/dces-dummy-drc
+    steps:
+      - checkout:
+          path: ~/laa-dces-dummy-drc
+      - attach_workspace:
+          at: .
+      - run:
+          name: Assemble JAR
+          command: ./gradlew assemble
+      - store_artifacts:
+          path: build/libs
+
+  build_and_scan_image:
+    docker:
+      - image: cimg/openjdk:17.0.4
+    working_directory: ~/laa-dces-dummy-drc/dces-dummy-drc
+    steps:
+      - checkout:
+          path: ~/laa-dces-dummy-drc
+      - attach_workspace:
+          at: .
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - aws-cli/setup:
+          role_arn: $ECR_ROLE_TO_ASSUME
+          region: $ECR_REGION
+      - run: |
+          aws ecr get-login-password --region $ECR_REGION | docker login --username AWS --password-stdin ${AWS_ECR_REGISTRY_ID}.dkr.ecr.${ECR_REGION}.amazonaws.com
+      - aws-ecr/build-image:
+          push-image: false
+          tag: ${CIRCLE_SHA1}
+          region: $ECR_REGION
+          repo: $ECR_REPOSITORY
+
+  build_and_push_image:
+    docker:
+      - image: cimg/openjdk:17.0.4
+    working_directory: ~/laa-dces-dummy-drc/dces-dummy-drc
+    steps:
+      - checkout:
+          path: ~/laa-dces-dummy-drc
+      - attach_workspace:
+          at: .
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - aws-cli/setup:
+          role_arn: $ECR_ROLE_TO_ASSUME
+          region: $ECR_REGION
+      - run: |
+          aws ecr get-login-password --region $ECR_REGION | docker login --username AWS --password-stdin ${AWS_ECR_REGISTRY_ID}.dkr.ecr.${ECR_REGION}.amazonaws.com
+      - aws-ecr/build-image:
+          push-image: true
+          tag: ${CIRCLE_SHA1}
+          region: $ECR_REGION
+          repo: $ECR_REPOSITORY
+      - push-integration-test-image
+
+  deploy-dev:
+    executor: cloud-platform-executor
+    steps:
+      - deploy-to:
+          environment: dev
+          token: ${CIRCLE_CI_TOKEN_DEV}
+      - run-integration-tests:
+          environment: dev
+          token: ${CIRCLE_CI_TOKEN_DEV}
+
+  deploy-uat:
+    executor: cloud-platform-executor
+    steps:
+      - deploy-to:
+          environment: uat
+          token: ${CIRCLE_CI_TOKEN_UAT}
+
+  deploy-staging:
+    executor: cloud-platform-executor
+    steps:
+      - deploy-to:
+          environment: staging
+          token: ${CIRCLE_CI_TOKEN_STAGING}
+
+  deploy-prod:
+    executor: cloud-platform-executor
+    steps:
+      - deploy-to:
+          environment: prod
+          token: ${CIRCLE_CI_TOKEN_PROD}
+
+# ------------------
+# WORKFLOWS
+# ------------------
+workflows:
+  version: 2
+
+  build-deploy-master:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only:
+                - main
+          context: SonarCloud
+
+      - scan_app:
+          requires:
+            - build
+
+      - test_and_assemble:
+          requires:
+            - scan_app
+
+      - build_and_scan_image:
+          requires:
+            - test_and_assemble
+
+      - build_and_push_image:
+          requires:
+            - build_and_scan_image
+
+      - deploy-dev:
+          requires:
+            - build_and_push_image
+
+      - hold_install_on_uat:
+          type: approval
+          requires:
+            - build_and_push_image
+
+      - deploy-uat:
+          requires:
+            - hold_install_on_uat
+
+      - hold_install_on_staging:
+          type: approval
+          requires:
+            - build_and_push_image
+
+      - deploy-staging:
+          requires:
+            - hold_install_on_staging
+
+      - hold_install_on_prod:
+          type: approval
+          requires:
+            - build_and_push_image
+
+      - deploy-prod:
+          requires:
+            - hold_install_on_prod
+
+  build-deploy-branch:
+    jobs:
+      - build:
+          filters:
+            branches:
+              ignore:
+                - main
+          context: SonarCloud
+
+      - scan_app:
+          requires:
+            - build
+
+      - test_and_assemble:
+          requires:
+            - scan_app
+
+      - build_and_scan_image:
+          requires:
+            - test_and_assemble
+
+      - build_and_push_image:
+          requires:
+            - build_and_scan_image
+
+      - hold_install_on_dev:
+          type: approval
+          requires:
+            - build_and_push_image
+
+      - deploy-dev:
+          requires:
+            - hold_install_on_dev
