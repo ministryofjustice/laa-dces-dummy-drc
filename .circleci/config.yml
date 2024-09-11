@@ -84,8 +84,13 @@ jobs:
       - checkout:
           path: ~/laa-dces-dummy-drc
       - run:
+          name: Enable SSH for debugging
+          command: echo "Enabling SSH for debugging"
+      - run:
           name: Install Dependencies and Build
-          command: ./gradlew clean build
+          command:  |
+            echo "Running build or tests"
+            ./gradlew clean build
 
   test_and_assemble:
     environment:
