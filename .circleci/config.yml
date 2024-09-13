@@ -92,6 +92,10 @@ jobs:
             echo "Running build or tests"
             pwd
             ./gradlew clean build
+      - persist_to_workspace:
+          root: .
+          paths:
+            - build
 
   test_and_assemble:
     environment:
