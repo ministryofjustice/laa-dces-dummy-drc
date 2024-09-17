@@ -41,13 +41,9 @@ commands:
             echo -n ${K8S_CLUSTER_CERT} | base64 -d > ./ca.crt
             kubectl config set-cluster ${K8S_CLUSTER_NAME} --certificate-authority=./ca.crt --server=https://${K8S_CLUSTER_NAME}
             kubectl config set-credentials circleci --token=<< parameters.token >>
-            echo "vvvv setting context"
             kubectl config set-context ${K8S_CLUSTER_NAME} --cluster=${K8S_CLUSTER_NAME} --user=circleci --namespace=laa-dces-dummy-drc-<< parameters.environment >>
-            echo "vvvv use-context"
             kubectl config use-context ${K8S_CLUSTER_NAME}
-            echo "vvvv get pods for env " << parameters.environment >>
             kubectl --namespace=laa-dces-dummy-drc-<< parameters.environment >> get pods
-            echo "vvvv after get pods"
 
   deploy-to:
     description: >
