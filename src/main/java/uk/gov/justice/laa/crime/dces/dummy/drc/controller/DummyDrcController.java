@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 
 @Slf4j
@@ -24,7 +25,9 @@ public class DummyDrcController {
   @PostMapping(value = "/test")
   public void test(@RequestBody final int requestedHttpStatus) {
     log.info("Received POST request {}", requestedHttpStatus);
-    if (requestedHttpStatus != 500) {
+    if (requestedHttpStatus >399 && requestedHttpStatus < 500) {
+      throw new HttpClientErrorException(HttpStatusCode.valueOf(requestedHttpStatus));
+    } else if (requestedHttpStatus > 500) {
       throw new HttpServerErrorException(HttpStatusCode.valueOf(requestedHttpStatus));
     }
   }
