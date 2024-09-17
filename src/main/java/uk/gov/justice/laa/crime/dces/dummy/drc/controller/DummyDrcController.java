@@ -27,7 +27,7 @@ public class DummyDrcController {
   public ResponseEntity<String> test(@RequestBody final int requestedHttpStatus) {
     log.info("Received POST request of status {}", requestedHttpStatus);
     if (requestedHttpStatus != 200) {
-      ResponseEntity.status(HttpStatusCode.valueOf(requestedHttpStatus));
+      return ResponseEntity.status(HttpStatusCode.valueOf(requestedHttpStatus)).body("Received POST request with status " + requestedHttpStatus);
     }
     return ResponseEntity.ok("Received test POST request");
   }
