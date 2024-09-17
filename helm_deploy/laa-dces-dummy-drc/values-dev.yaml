@@ -2,11 +2,11 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 image:
-  repository: ${AWS_ECR_ACCOUNT_URL}/laa-dces-team/laa-dces-dummy-drc-dev
+  repository: ${AWS_ECR_ACCOUNT_URL}/laa-dces-team/laa-dces-dummy-drc-dev-ecr
   pullPolicy: IfNotPresent
   #${AWS_ECR_REGISTRY_ID}.dkr.ecr.${ECR_REGION}.amazonaws.com
   # Overrides the image tag whose default is the chart appVersion.
-  tag: latest
+#  tag: latest
 
 sentry_dsn: https://73c8b29cf60925dfb51ff991af098c8f@o345774.ingest.sentry.io/4506031610462208
 aws_region: eu-west-2
