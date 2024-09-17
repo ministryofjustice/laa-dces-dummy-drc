@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: dummy-drc-ingress
   annotations:
-    external-dns.alpha.kubernetes.io/set-identifier: dummy-drc-ingress-${NAMESPACE}-green
+    external-dns.alpha.kubernetes.io/set-identifier: dummy-drc-ingress-laa-dces-dummy-drc-dev-green
     external-dns.alpha.kubernetes.io/aws-weight: "100"
 #    nginx.ingress.kubernetes.io/ssl-redirect: "true"
 #    nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
@@ -14,9 +14,9 @@ spec:
   ingressClassName: default
   tls:
     - hosts:
-        - ${NAMESPACE}.apps.live.cloud-platform.service.justice.gov.uk
+        - laa-dces-dummy-drc-dev.apps.live.cloud-platform.service.justice.gov.uk
   rules:
-    - host: ${NAMESPACE}.apps.live.cloud-platform.service.justice.gov.uk
+    - host: laa-dces-dummy-drc-dev.apps.live.cloud-platform.service.justice.gov.uk
       http:
         paths:
           - path: /
