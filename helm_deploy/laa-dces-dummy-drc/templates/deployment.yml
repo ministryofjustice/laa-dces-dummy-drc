@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: dummy-drc
-          image: ${REGISTRY}/${REPOSITORY}:${IMAGE_TAG}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           ports:
             - containerPort: 8080
             - containerPort: 8443
