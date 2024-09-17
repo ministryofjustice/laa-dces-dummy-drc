@@ -38,12 +38,20 @@ commands:
     steps:
       - run:
           command: |
+            echo "vvvv getting ca.crt"
             echo -n ${K8S_CLUSTER_CERT} | base64 -d > ./ca.crt
+            echo "vvvv got ca.crt"
+            ls -l ./ca.crt
             kubectl config set-cluster ${K8S_CLUSTER_NAME} --certificate-authority=./ca.crt --server=https://${K8S_CLUSTER_NAME}
+            echo "vvvv set cluster"
             kubectl config set-credentials circleci --token=<< parameters.token >>
+            echo "vvvv set credentials"
             kubectl config set-context ${K8S_CLUSTER_NAME} --cluster=${K8S_CLUSTER_NAME} --user=circleci --namespace=laa-dces-dummy-drc-<< parameters.environment >>
+            echo "vvvv set context"
             kubectl config use-context ${K8S_CLUSTER_NAME}
+            echo "vvvv getting pods for namespace:" << parameters.environment >>
             kubectl --namespace=laa-dces-dummy-drc-<< parameters.environment >> get pods
+            echo "vvvv got pods"
 
   deploy-to:
     description: >
@@ -152,6 +160,7 @@ jobs:
           role_arn: $ECR_ROLE_TO_ASSUME
           region: $ECR_REGION
       - run: |
+          echo "vvvv docker login"
           aws ecr get-login-password --region $ECR_REGION | docker login --username AWS --password-stdin ${AWS_ECR_REGISTRY_ID}.dkr.ecr.${ECR_REGION}.amazonaws.com
       - aws-ecr/build-image:
           push-image: true
