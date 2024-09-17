@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 image:
-  repository: ${AWS_ECR_ACCOUNT_URL}/laa-dces-team/laa-dces-dummy-drc-dev-ecr
+  repository: 754256621582.dkr.ecr.eu-west-2.amazonaws.com/laa-dces-team/laa-dces-dummy-drc-dev-ecr
   pullPolicy: IfNotPresent
   #${AWS_ECR_REGISTRY_ID}.dkr.ecr.${ECR_REGION}.amazonaws.com
   # Overrides the image tag whose default is the chart appVersion.
