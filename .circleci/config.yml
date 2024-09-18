@@ -284,3 +284,12 @@ workflows:
       - deploy-dev:
           requires:
             - hold_install_on_dev
+
+      - hold_install_on_uat:
+          type: approval
+          requires:
+            - build_and_push_image
+
+      - deploy-uat:
+          requires:
+            - hold_install_on_uat
