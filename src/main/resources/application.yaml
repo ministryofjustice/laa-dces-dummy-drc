@@ -3,3 +3,34 @@ spring:
     name: laa-dces-dummy-drc
 server:
   port: 8080
+
+management:
+  server:
+    port: 8188
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui-custom.html
+    enabled: true
+    operations-sorter: method
+  api-docs:
+    path: "/api-docs"
+    enabled: true
+  writer-with-order-by-keys: true
+  writer-with-default-pretty-printer: true
+  packages-to-scan: uk.gov.justice.laa.crime.dces.dummy.drc.controller
+
+api:
+  title: DCES DRC Integration Dummy DRC RestAPI
+  description: A Dummy DRC API for testing DCES DRC Integration Services.
+  version: 1.0
+  contactName: DCES Support Team
+  contactEmail: laa-dces@digital.justice.gov.uk
+  contactUrl: justice.gov.uk/laa
