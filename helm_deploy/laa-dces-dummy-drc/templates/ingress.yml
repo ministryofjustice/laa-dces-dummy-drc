@@ -1,28 +1,61 @@
+{{- if .Values.ingress.enabled -}}
+{{- $fullName := include "laa-dces-drc-integration.fullname" . -}}
+{{- $svcPort := .Values.service.port -}}
+{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
 apiVersion: networking.k8s.io/v1
+{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+apiVersion: networking.k8s.io/v1beta1
+{{- else -}}
+apiVersion: extensions/v1beta1
+{{- end }}
 kind: Ingress
 metadata:
-  name: dummy-drc-ingress
+  name: {{ $fullName }}
+  labels:
+    {{- include "laa-dces-drc-integration.labels" . | nindent 4 }}
+  {{- with .Values.ingress.annotations }}
   annotations:
-    external-dns.alpha.kubernetes.io/set-identifier: dummy-drc-ingress-laa-dces-dummy-drc-dev-green
-    external-dns.alpha.kubernetes.io/aws-weight: "100"
-    nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
-    nginx.ingress.kubernetes.io/auth-tls-secret: "laa-dces-dummy-drc-dev/ca-secret"  # Assuming the secret with CA certs for mTLS is named 'ca-secret'
-    nginx.ingress.kubernetes.io/auth-tls-verify-depth: "1"
-    nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
-  ingressClassName: default
+  ingressClassName: {{ .Values.ingress.className }}
+  {{- if .Values.ingress.tls }}
   tls:
+    {{- range .Values.ingress.tls }}
     - hosts:
-        - laa-dces-dummy-drc-dev.apps.live.cloud-platform.service.justice.gov.uk
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
   rules:
-    - host: laa-dces-dummy-drc-dev.apps.live.cloud-platform.service.justice.gov.uk
+    {{- range .Values.ingress.hosts }}
+    - host: {{ .host | quote }}
       http:
         paths:
-          - path: /
-            pathType: Prefix
+          {{- range .paths }}
+          - path: {{ . }}
+            pathType: "Prefix"
             backend:
               service:
-                name: dummy-drc-service # this should match the metadata.name in service.yml
+                name: {{ $fullName }}
                 port:
-                  number: 8080
+                  number: {{ $svcPort }}
+          - path: {{ $.Values.actuator.metrics.path }}
+            pathType: "Exact"
+            backend:
+              service:
+                name: {{ $fullName }}
+                port:
+                  number: {{ $.Values.actuator.port }}
+          - path: {{ $.Values.actuator.health.path }}
+            pathType: "Exact"
+            backend:
+              service:
+                name: {{ $fullName }}
+                port:
+                  number: {{ $.Values.actuator.port }}
+          {{- end }}
+    {{- end }}
+  {{- end }}
