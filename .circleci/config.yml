@@ -166,14 +166,12 @@ jobs:
           push-image: true
           tag: ${CIRCLE_SHA1}
           region: $ECR_REGION
-          repo: $ECR_REPOSITORY
+          repo: ECR_REPOSITORY
       - run:
           name: "Log Image URL"
           command: |
             IMAGE_URL="${AWS_ECR_REGISTRY_ID:-<Not Set>}.dkr.ecr.${ECR_REGION}.amazonaws.com/${ECR_REPOSITORY}:${CIRCLE_SHA1}"
             echo "Image URL: $IMAGE_URL"
-            vvvv=$ECR_REPOSITORY
-            echo "ECR_REPOSITORY value is: $vvvv"
   deploy-dev:
     executor: cloud-platform-executor
     steps:
