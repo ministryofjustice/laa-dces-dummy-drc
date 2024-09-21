@@ -166,7 +166,7 @@ jobs:
           push-image: true
           tag: ${CIRCLE_SHA1}
           region: $ECR_REGION
-          repo: ECR_REPOSITORY
+          repo: "laa-dces-team/laa-dces-dummy-drc-uat-ecr"
       - run:
           name: "Log Image URL"
           command: |
