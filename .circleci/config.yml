@@ -166,11 +166,11 @@ jobs:
           push-image: true
           tag: ${CIRCLE_SHA1}
           region: $ECR_REGION
-          repo: $ECR_REPOSITORY
+          repo: laa-dces-team/laa-dces-dummy-drc-uat
       - run:
           name: "Log Image URL"
           command: |
-            IMAGE_URL="${AWS_ECR_REGISTRY_ID}.dkr.ecr.${ECR_REGION}.amazonaws.com/${ECR_REPOSITORY}:${CIRCLE_SHA1}"
+            IMAGE_URL="${AWS_ECR_REGISTRY_ID:-<Not Set>}.dkr.ecr.${ECR_REGION}.amazonaws.com/${ECR_REPOSITORY}:${CIRCLE_SHA1}"
             echo "Image URL: $IMAGE_URL"
   deploy-dev:
     executor: cloud-platform-executor
