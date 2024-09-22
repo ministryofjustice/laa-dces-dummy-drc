@@ -74,7 +74,10 @@ commands:
           chart: ./helm_deploy/laa-dces-dummy-drc/
           release-name: laa-dces-dummy-drc
           values: ./helm_deploy/laa-dces-dummy-drc/values-<< parameters.environment >>.yaml
-          values-to-override: image.tag=${CIRCLE_SHA1}
+          values-to-override: |
+            image:
+              tag: "${CIRCLE_SHA1}"
+              repository: "${AWS_ECR_REGISTRY_ID:-<Not Set>}.dkr.ecr.${ECR_REGION}.amazonaws.com/${ECR_REPOSITORY}"
 
 # ------------------
 # JOBS
@@ -166,7 +169,7 @@ jobs:
           push-image: true
           tag: ${CIRCLE_SHA1}
           region: $ECR_REGION
-          repo: "laa-dces-team/laa-dces-dummy-drc-uat-ecr"
+          repo: $ECR_REPOSITORY
       - run:
           name: "Log Image URL"
           command: |
