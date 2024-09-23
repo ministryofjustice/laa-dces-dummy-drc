@@ -74,7 +74,7 @@ commands:
           chart: ./helm_deploy/laa-dces-dummy-drc/
           release-name: laa-dces-dummy-drc
           values: ./helm_deploy/laa-dces-dummy-drc/values-<< parameters.environment >>.yaml
-          values-to-override: image.tag=${CIRCLE_SHA1}, image.repository=${AWS_ECR_REGISTRY_ID}.dkr.ecr.${ECR_REGION}.amazonaws.com/${ECR_REPOSITORY}
+          values-to-override: image.tag=${CIRCLE_SHA1}
 
 # ------------------
 # JOBS
