@@ -37,7 +37,11 @@ ingress:
     nginx.ingress.kubernetes.io/affinity: "cookie"
     nginx.ingress.kubernetes.io/session-cookie-max-age: "300"
     nginx.ingress.kubernetes.io/limit-rps: "100"
-
+    nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
+    nginx.ingress.kubernetes.io/auth-tls-secret: laa-dces-dummy-drc-uat/ca-secret
+    nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
+    nginx.ingress.kubernetes.io/auth-tls-verify-depth: "1"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
     # See https://security-guidance.service.justice.gov.uk/implement-security-txt and
     # https://user-guide.cloud-platform.service.justice.gov.uk/documentation/networking/redirect-security-txt.html
     nginx.ingress.kubernetes.io/server-snippet: |
