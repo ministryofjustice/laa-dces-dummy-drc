@@ -1,14 +1,21 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: dummy-drc
+  name: {{ include "laa-dces-dummy-drc.fullname" . }}
+  labels:
+    {{- include "laa-dces-dummy-drc.labels" . | nindent 4 }}
 spec:
-  selector:
-    app: dummy-drc # this should match the pod label in deployment.yml
+  type: {{ .Values.service.type }}
   ports:
-    - name: http
-      port: 8080
-      targetPort: 8080
-#    - name: https
-#      port: 443
-#      targetPort: 8080
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    {{- if not (eq (toString .Values.actuator.port) "http") }}
+    - port: {{ .Values.actuator.port }}
+      targetPort: actuator
+      protocol: TCP
+      name: actuator
+    {{- end }}
+  selector:
+    {{- include "laa-dces-dummy-drc.selectorLabels" . | nindent 4 }}
