@@ -68,7 +68,9 @@ ingress:
     # potential for change below:
     - host: laa-dces-dummy-drc-uat.apps.live.cloud-platform.service.justice.gov.uk
       paths: [ "/" ]
-  tls: [ ]
+  tls:
+    - host:
+        - laa-dces-dummy-drc-uat.apps.live.cloud-platform.service.justice.gov.uk
   className: modsec
 
 replicaCount: 1
