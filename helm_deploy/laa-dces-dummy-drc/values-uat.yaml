@@ -44,10 +44,10 @@ ingress:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     # See https://security-guidance.service.justice.gov.uk/implement-security-txt and
     # https://user-guide.cloud-platform.service.justice.gov.uk/documentation/networking/redirect-security-txt.html
-    nginx.ingress.kubernetes.io/server-snippet: |
-      location = /.well-known/security.txt {
-        return 301 https://security-guidance.service.justice.gov.uk/.well-known/security.txt;
-      }
+#    nginx.ingress.kubernetes.io/server-snippet: |
+#      location = /.well-known/security.txt {
+#        return 301 https://security-guidance.service.justice.gov.uk/.well-known/security.txt;
+#      }
 
 #    nginx.ingress.kubernetes.io/enable-modsecurity: "true"
     # paranoia_level, executing_paranoia_level, and allowed_methods are variables used to configure when ModSecurity
