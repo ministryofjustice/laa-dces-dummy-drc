@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: dummy-drc-service
+  name: dummy-drc
 spec:
   selector:
     app: dummy-drc # this should match the pod label in deployment.yml
