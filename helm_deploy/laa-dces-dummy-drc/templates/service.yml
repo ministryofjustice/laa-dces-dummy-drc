@@ -18,4 +18,4 @@ spec:
       name: actuator
     {{- end }}
   selector:
-    app: dummy-drc
+    {{- include "laa-dces-dummy-drc.selectorLabels" . | nindent 4 }}
