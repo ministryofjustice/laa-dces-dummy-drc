@@ -8,11 +8,11 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: {{- include "laa-dces-dummy-drc.selectorLabels" . | nindent 4 }} # this should match the selector in service.yml
+      {{- include "laa-dces-dummy-drc.selectorLabels" . | nindent 6 }} # this should match the selector in service.yml
   template:
     metadata:
       labels:
-        app: {{- include "laa-dces-dummy-drc.selectorLabels" . | nindent 4 }} # this should match the selector in service.yml
+        {{- include "laa-dces-dummy-drc.selectorLabels" . | nindent 8 }} # this should match the selector in service.yml
     spec:
       containers:
         - name: dummy-drc
