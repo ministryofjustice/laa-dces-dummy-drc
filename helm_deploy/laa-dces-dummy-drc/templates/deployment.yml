@@ -11,12 +11,60 @@ spec:
       {{- include "laa-dces-dummy-drc.selectorLabels" . | nindent 6 }} # this should match the selector in service.yml
   template:
     metadata:
+    {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
       labels:
         {{- include "laa-dces-dummy-drc.selectorLabels" . | nindent 8 }} # this should match the selector in service.yml
     spec:
       containers:
-        - name: dummy-drc
+        - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           ports:
-            - containerPort: 8080
-            - containerPort: 8443
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+            {{- if not (eq (toString .Values.actuator.port) "http") }}
+            - name: actuator
+              containerPort: {{ .Values.actuator.port }}
+              protocol: TCP
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.actuator.health.path }}
+            {{- if not (eq (toString .Values.actuator.port) "http") }}
+              port: actuator
+            {{- else }}
+              port: http
+            {{- end }}
+            initialDelaySeconds: {{ .Values.actuator.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.actuator.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.actuator.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.actuator.liveness.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.actuator.health.path }}
+            {{- if not (eq (toString .Values.actuator.port) "http") }}
+              port: actuator
+            {{- else }}
+              port: http
+            {{- end }}
+            initialDelaySeconds: {{ .Values.actuator.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.actuator.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.actuator.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.actuator.readiness.failureThreshold }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
