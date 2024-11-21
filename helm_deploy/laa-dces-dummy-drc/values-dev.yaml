@@ -38,7 +38,7 @@ ingress:
     nginx.ingress.kubernetes.io/session-cookie-max-age: "300"
     nginx.ingress.kubernetes.io/limit-rps: "100"
     nginx.ingress.kubernetes.io/auth-tls-pass-certificate-to-upstream: "true"
-    nginx.ingress.kubernetes.io/auth-tls-secret: laa-dces-dummy-drc-dev/ca-secret
+    nginx.ingress.kubernetes.io/auth-tls-secret: laa-dces-dummy-drc-dev/client-ca
     nginx.ingress.kubernetes.io/auth-tls-verify-client: "on"
     nginx.ingress.kubernetes.io/auth-tls-verify-depth: "1"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
