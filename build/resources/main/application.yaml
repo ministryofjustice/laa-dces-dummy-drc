@@ -1,5 +1,0 @@
-spring:
-  application:
-    name: laa-dces-dummy-drc
-server:
-  port: 8080
