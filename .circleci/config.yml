@@ -79,7 +79,7 @@ jobs:
       GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.workers.max=2"
     docker:
       - image: cimg/openjdk:17.0.4
-    working_directory: ~/laa-dces-dummy-drc/dces-dummy-drc
+    working_directory: ~/laa-dces-dummy-drc
     steps:
       - checkout:
           path: ~/laa-dces-dummy-drc
