@@ -90,10 +90,12 @@ jobs:
           name: Install Dependencies and Build
           command:  |
             echo "Running build or tests"
-            echo "Running ls"
-            ls
             echo "Running pwd"
             pwd
+            echo "Running ls"
+            ls
+            echo "Running ls .."
+            ls ..
             echo "Running ./gradlew"
             ./gradlew clean build
 
