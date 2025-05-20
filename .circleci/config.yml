@@ -90,13 +90,6 @@ jobs:
           name: Install Dependencies and Build
           command:  |
             echo "Running build or tests"
-            echo "Running pwd"
-            pwd
-            echo "Running ls"
-            ls
-            echo "Running ls .."
-            ls ..
-            echo "Running ./gradlew"
             ./gradlew clean build
 
   test_and_assemble:
@@ -105,7 +98,7 @@ jobs:
       GRADLE_OPTS: "-Dorg.gradle.daemon=true -Dorg.gradle.workers.max=2"
     docker:
       - image: cimg/openjdk:17.0.4
-    working_directory: ~/laa-dces-dummy-drc/dces-dummy-drc
+    working_directory: ~/laa-dces-dummy-drc
     steps:
       - checkout:
           path: ~/laa-dces-dummy-drc
@@ -120,7 +113,7 @@ jobs:
   build_and_scan_image:
     docker:
       - image: cimg/openjdk:17.0.4
-    working_directory: ~/laa-dces-dummy-drc/dces-dummy-drc
+    working_directory: ~/laa-dces-dummy-drc
     steps:
       - checkout:
           path: ~/laa-dces-dummy-drc
@@ -142,7 +135,7 @@ jobs:
   build_and_push_image:
     docker:
       - image: cimg/openjdk:17.0.4
-    working_directory: ~/laa-dces-dummy-drc/dces-dummy-drc
+    working_directory: ~/laa-dces-dummy-drc
     steps:
       - checkout:
           path: ~/laa-dces-dummy-drc
