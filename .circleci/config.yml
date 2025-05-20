@@ -90,6 +90,7 @@ jobs:
           name: Install Dependencies and Build
           command:  |
             echo "Running build or tests"
+            ls
             ./gradlew clean build
 
   test_and_assemble:
